@@ -8,6 +8,7 @@ const {
   logout,
   refreshUserAccessToken,
   changePassword,
+  verifyEmail,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const User = require("../models/User");
@@ -24,6 +25,7 @@ router.post("/login", login);
 router.post("/refresh-token", refreshUserAccessToken);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
+router.get("/verify-email/:token", verifyEmail);
 
 // Protected routes (require authentication)
 router.post("/logout", authMiddleware, logout);
@@ -48,9 +50,6 @@ router.get(
     const { accessToken, refreshToken } = generateTokens(user);
     setAuthCookies({ res, accessToken, refreshToken });
 
-    console.log("access token:", accessToken);
-    console.log("refresh token:", refreshToken);
-
     res.redirect(`${FRONTEND_URL}/profile`);
   }
 );
@@ -70,6 +69,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
         email: user.email,
         fullname: user.fullname,
         isActive: user.isActive,
+        emailVerified: user.emailVerified,
       },
     });
   } catch (err) {

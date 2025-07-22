@@ -5,7 +5,10 @@ const jwt = require("jsonwebtoken");
 const ApiError = require("../utils/ApiError");
 const sendEmail = require("../utils/sendEmail");
 const { JWT_REFRESH_SECRET, FRONTEND_URL } = require("../constants/env");
-const { getPasswordResetTemplate } = require("../utils/emailTemplates");
+const {
+  getPasswordResetTemplate,
+  getVerifyEmailTemplate,
+} = require("../utils/emailTemplates");
 const generateTokens = require("../utils/generateTokens");
 const {
   getRefreshTokenCookieOptions,
@@ -13,7 +16,7 @@ const {
   clearAuthCookies,
   setAuthCookies,
 } = require("../utils/cookies");
-const { ONE_DAY_MS } = require("../utils/date");
+const { ONE_DAY_MS, oneYearFromNow } = require("../utils/date");
 const HttpStatus = require("../constants/http");
 
 exports.register = async (req, res, next) => {
@@ -37,14 +40,27 @@ exports.register = async (req, res, next) => {
       );
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    // Email verification token ve expire oluştur
+    const emailVerificationToken = crypto.randomBytes(32).toString("hex");
+    const emailVerificationExpire = oneYearFromNow();
     const user = await User.create({
       email,
       fullname,
       password: hashedPassword,
+      emailVerificationToken,
+      emailVerificationExpire,
+      emailVerified: false,
     });
     const { accessToken, refreshToken } = generateTokens(user);
 
     setAuthCookies({ res, accessToken, refreshToken });
+
+    // Email verification linki gönder
+    const verifyUrl = `${FRONTEND_URL}/verify-email/${emailVerificationToken}`;
+    await sendEmail({
+      to: user.email,
+      ...getVerifyEmailTemplate(verifyUrl),
+    });
 
     res.status(HttpStatus.CREATED).json({
       user: {
@@ -52,7 +68,9 @@ exports.register = async (req, res, next) => {
         email: user.email,
         fullname: user.fullname,
         isActive: user.isActive,
+        emailVerified: user.emailVerified,
       },
+      message: "Registration successful! Please verify your email address.",
     });
   } catch (err) {
     next(err);
@@ -270,6 +288,46 @@ exports.refreshUserAccessToken = (req, res, next) => {
 
       res.status(HttpStatus.OK).json({ accessToken, newRefreshToken });
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Email verification endpoint
+exports.verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      throw new ApiError(HttpStatus.BAD_REQUEST, "Token is required.");
+    }
+
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      throw new ApiError(
+        HttpStatus.BAD_REQUEST,
+        "Invalid or expired verification token."
+      );
+    }
+
+    if (user.emailVerified) {
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: "Email is already verified." });
+    }
+
+    user.emailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpire = null;
+    await user.save();
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: "Email successfully verified." });
   } catch (err) {
     next(err);
   }

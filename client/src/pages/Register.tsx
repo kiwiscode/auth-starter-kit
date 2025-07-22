@@ -21,11 +21,9 @@ const Register: React.FC = () => {
         fullname,
         password,
       });
-      console.log("res:", res);
       setUser(res.data.user);
       navigate("/profile");
     } catch (err: unknown) {
-      console.log("err", err);
       if (isAxiosError(err)) {
         setError(err.response?.data?.error || "Register failed");
       } else {

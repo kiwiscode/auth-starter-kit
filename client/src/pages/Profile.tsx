@@ -32,7 +32,6 @@ const Profile: React.FC = () => {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: unknown) {
-      console.log("err", err);
       if (isAxiosError(err)) {
         setChangeError(err.response?.data?.error || "An error occurred");
       } else {
@@ -47,7 +46,36 @@ const Profile: React.FC = () => {
     <div>
       <h1>Profile</h1>
       <div>ID: {user.id}</div>
-      <div>Email: {user.email}</div>
+      <div>
+        Email: {user.email}{" "}
+        {user.emailVerified ? (
+          <span
+            style={{
+              background: "#4caf50",
+              color: "white",
+              borderRadius: 6,
+              padding: "2px 8px",
+              marginLeft: 8,
+              fontSize: 12,
+            }}
+          >
+            Verified
+          </span>
+        ) : (
+          <span
+            style={{
+              background: "#f44336",
+              color: "white",
+              borderRadius: 6,
+              padding: "2px 8px",
+              marginLeft: 8,
+              fontSize: 12,
+            }}
+          >
+            Not Verified
+          </span>
+        )}
+      </div>
       <div>Full Name: {user.fullname}</div>
       <div>Active: {user.isActive ? "Yes" : "No"}</div>
       <hr />

@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App: React.FC = () => {
   const path = useLocation().pathname;
@@ -77,6 +78,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
       </Routes>
     </>
   );

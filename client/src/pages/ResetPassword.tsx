@@ -27,7 +27,6 @@ const ResetPassword: React.FC = () => {
       setUser(res.data.user);
       setTimeout(() => navigate("/profile"), 1000);
     } catch (err: unknown) {
-      console.log("err", err);
       if (isAxiosError(err)) {
         setError(err.response?.data?.error || "Password reset failed");
       } else {

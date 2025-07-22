@@ -7,6 +7,7 @@ interface User {
   email: string;
   fullname: string;
   isActive: boolean;
+  emailVerified: boolean;
 }
 
 interface AuthContextType {

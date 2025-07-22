@@ -24,11 +24,9 @@ const Login: React.FC = () => {
         email,
         password,
       });
-      console.log("res:", res);
       setUser(res.data.user);
       navigate("/profile");
     } catch (err: unknown) {
-      console.log("err", err);
       if (isAxiosError(err)) {
         setError(err.response?.data?.error || "Login failed");
       } else {
@@ -47,7 +45,6 @@ const Login: React.FC = () => {
         "If this email is registered, password reset instructions have been sent."
       );
     } catch (err: unknown) {
-      console.log("err", err);
       if (isAxiosError(err)) {
         setForgotError(err.response?.data?.error || "An error occurred");
       } else {
