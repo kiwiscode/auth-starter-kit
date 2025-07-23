@@ -31,12 +31,8 @@ app.use("/api/auth", authRouter);
 // Global error handler
 app.use((err, req, res, next) => {
   if (err.statusCode) {
-    console.error("err.statusCode:", err.statusCode);
-    console.log("err.message:", err.message);
     res.status(err.statusCode).json({ error: err.message });
   } else {
-    console.error("err.stack:", err.stack);
-    console.log("err.message:", err.message);
     res
       .status(HttpStatus.INTERNAL_SERVER_ERROR)
       .json({ error: "Internal Server Error" });

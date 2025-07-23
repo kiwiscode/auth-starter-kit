@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 import api from "../api/axiosConfig";
+import axios from "axios";
 
 interface User {
   id: string;
@@ -40,7 +41,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await api.post("/auth/logout");
+      // Use direct axios to prevent the logout request from triggering the interceptor.
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
     } catch (err: unknown) {
       console.error("Logout failed:", err);
     } finally {
@@ -62,4 +70,14 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+};
+
+// We will extract the logout function outside the interceptor as a callback
+let logoutCallback: (() => void) | null = null;
+export const setLogoutCallback = (cb: () => void) => {
+  logoutCallback = cb;
+};
+
+export const triggerLogout = () => {
+  if (logoutCallback) logoutCallback();
 };

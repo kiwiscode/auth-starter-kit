@@ -7,17 +7,18 @@ module.exports = (req, res, next) => {
   const token = req.cookies?.accessToken;
 
   if (!token) {
-    throw new ApiError(HttpStatus.UNAUTHORIZED, "Unauthorized");
+    throw new ApiError(HttpStatus.UNAUTHORIZED, "NoAccessToken");
   }
 
   jwt.verify(token, JWT_ACCESS_SECRET, (err, decoded) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
-        throw new ApiError(HttpStatus.UNAUTHORIZED, "Token has expired");
+        throw new ApiError(HttpStatus.UNAUTHORIZED, "TokenExpiredError");
       } else {
         throw new ApiError(HttpStatus.FORBIDDEN, "Invalid token");
       }
     }
+
     req.userId = decoded.id || decoded._id || decoded.userId;
     next();
   });

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { triggerLogout } from "../context/AuthContext";
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api`,
@@ -27,6 +28,8 @@ api.interceptors.response.use(
 
     if (
       error.response?.status === 401 &&
+      (error.response.data?.error === "TokenExpiredError" ||
+        error.response.data?.error === "NoAccessToken") &&
       !originalRequest._retry &&
       !isWhitelisted(originalRequest.url)
     ) {
@@ -35,6 +38,7 @@ api.interceptors.response.use(
         await api.post("/auth/refresh-token");
         return api(originalRequest);
       } catch (err) {
+        triggerLogout();
         return Promise.reject(err);
       }
     }

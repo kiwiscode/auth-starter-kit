@@ -244,7 +244,7 @@ exports.changePassword = async (req, res, next) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      throw new ApiError(HttpStatus.UNAUTHORIZED, "Old password is incorrect.");
+      throw new ApiError(HttpStatus.BAD_REQUEST, "Old password is incorrect.");
     }
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();

@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import VerifyEmail from "./pages/VerifyEmail";
+import LogoutSetup from "./pages/Logout";
 
 const App: React.FC = () => {
   const path = useLocation().pathname;
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   return (
     <>
       <Navbar />
+      <LogoutSetup />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
