@@ -1,5 +1,10 @@
 const { NODE_ENV } = require("../constants/env");
-const { sevenDaysFromNow, thirtyDaysFromNow } = require("./date");
+const {
+  sevenDaysFromNow,
+  thirtyDaysFromNow,
+  tenSecondsFromNow,
+  oneMinuteFromNow,
+} = require("./date");
 
 const REFRESH_PATH = "/";
 
@@ -11,12 +16,14 @@ const defaults = {
 
 const getAccessTokenCookieOptions = () => ({
   ...defaults,
-  expires: sevenDaysFromNow(),
+  // expires: sevenDaysFromNow(),
+  expires: tenSecondsFromNow(),
 });
 
 const getRefreshTokenCookieOptions = () => ({
   ...defaults,
-  expires: thirtyDaysFromNow(),
+  // expires: thirtyDaysFromNow(),
+  expires: oneMinuteFromNow(),
   path: REFRESH_PATH,
 });
 
