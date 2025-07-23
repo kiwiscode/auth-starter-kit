@@ -16,7 +16,11 @@ const {
   clearAuthCookies,
   setAuthCookies,
 } = require("../utils/cookies");
-const { ONE_DAY_MS, oneYearFromNow } = require("../utils/date");
+const {
+  ONE_DAY_MS,
+  oneYearFromNow,
+  FIFTEEN_SECONDS_MS,
+} = require("../utils/date");
 const HttpStatus = require("../constants/http");
 
 exports.register = async (req, res, next) => {
@@ -276,7 +280,8 @@ exports.refreshUserAccessToken = (req, res, next) => {
       const { accessToken, refreshToken: newRefreshToken } =
         generateTokens(user);
 
-      if (timeLeft <= ONE_DAY_MS) {
+      // if (timeLeft <= ONE_DAY_MS) {
+      if (timeLeft <= FIFTEEN_SECONDS_MS) {
         res.cookie(
           "refreshToken",
           newRefreshToken,
