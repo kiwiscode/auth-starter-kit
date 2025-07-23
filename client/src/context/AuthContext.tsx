@@ -72,7 +72,7 @@ export const useAuth = () => {
   return context;
 };
 
-// We will extract the logout function outside the interceptor as a callback
+// Extract the logout function outside the interceptor as a callback
 let logoutCallback: (() => void) | null = null;
 export const setLogoutCallback = (cb: () => void) => {
   logoutCallback = cb;
